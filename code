@@ -1,64 +1,3 @@
-# https://leetcode.com/problems/rearrange-characters-to-make-target-string/
-
-class Solution:
-    def rearrangeCharacters(self, s: str, target: str) -> int:
-        
-        dictar = {}
-        for i in target:
-            if i not in dictar:
-                dictar[i]=0
-            dictar[i]+=1
-        
-        dics = {}
-        for i in s:
-            if i in dictar:
-                if i not in dics:
-                    dics[i]=0
-                dics[i]+=1
-        
-        if set(dictar)!=set(dics):
-            return 0
-        
-        minfactor = float(inf)
-        for c in dics:
-            factor = dics[c]//dictar[c]
-            if factor < minfactor:
-                minfactor = factor
-        
-        return minfactor
-
-
-# https://leetcode.com/problems/max-points-on-a-line/
-
-class Solution:
-    def maxPoints(self, points: List[List[int]]) -> int:
-        if len(points)==1:
-	        return 1
-        
-        arr = [((p[0],p[1]),(q[0],q[1])) for ind,p in enumerate(points) for q in points[ind+1:]]
-        
-        dic = {}
-        for (x1,y1),(x2,y2) in arr:
-            if x1==x2:
-                a = 'inf'
-                b = x1
-            elif y1==y2:
-                a = 0
-                b = y1
-            else:
-                from fractions import Fraction
-                a = Fraction((y2-y1),(x2-x1))
-                b = y1 - a*x1
-            if (a,b) not in dic:
-                dic[(a,b)]=0
-            dic[(a,b)]+=1
-        
-        # k = (n*(n-1))/2
-        ans = (1 + (1+8*max(dic.values()))**(1/2)) / 2
-        return int(ans)
-
-
-
 # https://leetcode.com/problems/maximum-number-of-visible-points/
 
 class Solution:
@@ -69,14 +8,16 @@ class Solution:
 
         from math import pi, atan
 
+	# выражение угла в радианах
         angle = angle*pi/180
 
+	# нормирование всех точек относительно [0,0]
         i, j = location[0], location[1]
         for k in range(len(points)):
             x, y = points[k]
             points[k] = [x-i, y-j]
 
-        # угол между point и [1,0]
+        # выражение всех точек в радианах - угол между вектором, соответсвующим точке, и [1,0]
         temp = []
         for k in range(len(points)):
             x, y = points[k]
@@ -114,23 +55,3 @@ class Solution:
                     i+=1
 
         return maxnum + points.count([0,0])
-
-
-
-# https://leetcode.com/problems/movie-rating/?envType=study-plan-v2&envId=top-sql-50
-
-SELECT K1.name results FROM 
-    (SELECT T1.name, COUNT(T1.movie_id) nums_of_rat FROM 
-        (SELECT Users.name name, MovieRating.movie_id movie_id, MovieRating.created_at created_at FROM Users INNER JOIN MovieRating ON Users.user_id=MovieRating.user_id) T1 
-     GROUP BY T1.name 
-     ORDER BY nums_of_rat DESC, name 
-     LIMIT 1) K1
-UNION ALL
-SELECT K2.title FROM 
-    (SELECT T2.title, AVG(T2.rat) avg_rat FROM 
-        (SELECT Movies.title title, MovieRating.rating rat, MovieRating.created_at created_at FROM Movies INNER JOIN MovieRating ON Movies.movie_id=MovieRating.movie_id
-         WHERE created_at LIKE '2020-02-__') T2 
-     GROUP BY T2.title 
-     ORDER BY avg_rat DESC, title 
-     LIMIT 1) K2
-
